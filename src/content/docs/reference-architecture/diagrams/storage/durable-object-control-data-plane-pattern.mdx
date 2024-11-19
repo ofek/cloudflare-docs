@@ -1,0 +1,48 @@
+---
+title: "Control and data plane architectural pattern for Durable Objects"
+pcx_content_type: reference-architecture-diagram
+products:
+  - Durable Objects
+sidebar:
+  order: 1
+  label: Control and data plane architectural pattern for Durable Objects
+updated: 2024-11-18
+---
+
+## Introduction
+
+[Durable Objects](https://developers.cloudflare.com/durable-objects/) are built on-top of Cloudflare Workers spanning several locations across our global infrastructure network.
+Each Durable Object instance has its own durable storage persisted across requests, in-memory state, single-threaded execution, and can be placed in a specific region.
+
+A single Durable Object instance has certain [performance and storage capabilities](https://developers.cloudflare.com/durable-objects/platform/limits/).
+Therefore, in order to scale an application without being restricted by a single instance’s limits we need to shard our application data as much as possible, and take advantage of the Cloudflare infrastructure by spreading our Durable Object instances across the world, moving both the data and compute as close to users as possible.
+
+This document describes a useful architectural pattern to separate the control plane from the data plane of your application to achieve great performance and reliability without compromising on functionality.
+
+- The **control plane** provides the administrative APIs used to manage resource metadata. For example, a user creating and deleting a wiki, or listing all wikis of a user.
+- The **data plane** provides the primary function of the application and handles the operations on the resources data directly. For example, fetching and updating the content of a wiki, or updating the content of a collaborative document. Data planes are intentionally less complicated, with less moving parts compared to control planes, and usually handle a much larger volume of requests.
+- The **management plane** is an optional component of a system providing a higher level of interaction with the control plane to simplify configuration and operations. In this document, we won’t focus on this as the same principles apply as to the control plane.
+
+## Control and data plane separation pattern
+
+In this pattern, our application consists of at least one Durable Object instance for each resource type handling all the control plane operations, and as many Durable Object instances as we need for the data plane operations, one for each resource created in the application.
+
+You can scale to millions of Durable Object instances, one for each of your resources.
+
+The main advantage of this architectural pattern is that our data plane operations, usually with larger volume of requests than control plane operations, are handled directly by the Durable Object instances holding the resource data without going through the control plane Durable Object instance.
+Therefore, the application’s performance and availability is not limited by a single Durable Object instance, but is shared across thousands or millions of Durable Objects.
+
+Let’s dive into an example for a generic resource type `XYZ`, where `XYZ` could in-practice be a wiki, a collaborative document, a database for each user, or any other resource type in your application.
+
+![Figure 1: Control and data plane architectural pattern for Durable Objects](~/assets/images/reference-architecture/durable-objects-control-data-plane-pattern/diagram.svg "Figure 1: Control and data plane architectural pattern for Durable Objects")
+
+
+## Related Resources
+
+- https://developers.cloudflare.com/durable-objects/api/namespace/
+- https://blog.cloudflare.com/durable-objects-easy-fast-correct-choose-three/ 
+- https://blog.cloudflare.com/sqlite-in-durable-objects/
+- https://thenewstack.io/data-control-management-three-planes-different-altitudes/ 
+- Examples of this architectural pattern in real-world applications:
+    - https://blog.cloudflare.com/how-we-built-cloudflare-queues/ 
+    - https://www.lambrospetrou.com/articles/tiddlyflare/ 
