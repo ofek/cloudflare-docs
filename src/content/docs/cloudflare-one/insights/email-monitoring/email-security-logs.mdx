@@ -1,0 +1,49 @@
+---
+title: Email Security logs
+pcx_content_type: how-to
+sidebar:
+  order: 5
+---
+
+Email Security allows you to configure logs to send detection data to an endpoint of your choosing.
+
+To enable Logpush for Email Security:
+
+1. Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/).
+2. Select **Analytics & Logs** > **Logpush**.
+2. Select **Create a Logpush job**, then select **S3-Compatible**.
+3. Enter the **destination details**:
+    - **Bucket**: Enter the bucket name.
+    - **Endpoint URL**: Enter your endpoint URL. To find your endpoint URL:
+      - On the Cloudflare dashboard, go to **R2 Object Storage** > **Overview** > Select your bucket.
+      - Go to Settings, and copy and paste the **S3 API** URL.
+    - **Bucket region**: Enter the Bucket region: Enter the region of your bucket: To find the bucket region:
+      - On the dashboard, go to **R2 Object Storage** > **Overview** > Select your bucket.
+      - Go to Settings, and find your region in **Location**.
+    - Enter the **Access Key ID**.
+    - Enter the **Secret Access Key**.
+4. Select **Continue**. Your destination has now been configured.
+
+## Audit logs
+
+Once you have configured your destination, you can audit your logs.
+
+1. Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/).
+2. Select **Analytics & Logs** > **Logpush**.
+3. Select **Audit logs**.
+4. **Configure logpush job**: 
+  - **Job name**: Enter the job name.
+  - **If logs match**: Select **Filtered logs**:
+    - Field: Choose ResourceType
+    - Operator: starts with
+    - Value: Enter `email_security`
+  - **Send the following field**: Ensure **General** is selected.
+5. Select **Submit**.
+
+Your job has now been created successfully.
+
+To view the job you created:
+
+1. Log in to the [Cloudflare dashboard](https://dash.cloudflare.com/).
+2. Go to **R2 Object Storage**, select your bucket.
+3. Select **Objects**.
